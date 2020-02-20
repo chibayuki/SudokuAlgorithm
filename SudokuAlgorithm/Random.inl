@@ -1,8 +1,8 @@
 ﻿/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-Copyright © 2019 chibayuki@foxmail.com
+Copyright © 2020 chibayuki@foxmail.com
 
 SudokuAlgorithm.Random
-Version 20.2.17.0000
+Version 20.2.20.0000
 
 This file is part of SudokuAlgorithm
 
@@ -23,7 +23,7 @@ public:
 		srand((uint32_t)time(nullptr));
 	}
 	
-	inline Random(uint32_t seed) 
+	inline explicit Random(uint32_t seed) 
 	{
 		srand(seed);
 	}

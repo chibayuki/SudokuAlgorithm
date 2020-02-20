@@ -1,8 +1,8 @@
 ﻿/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-Copyright © 2019 chibayuki@foxmail.com
+Copyright © 2020 chibayuki@foxmail.com
 
 SudokuAlgorithm.Demo
-Version 20.2.17.0000
+Version 20.2.20.0000
 
 This file is part of SudokuAlgorithm
 
@@ -22,7 +22,7 @@ int main()
 
 	cout << endl;
 
-	if (Sudoku::TrySolve(s, s))
+	if (s.TrySolve())
 	{
 		s.Print();
 

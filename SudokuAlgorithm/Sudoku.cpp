@@ -1,8 +1,8 @@
 ﻿/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-Copyright © 2019 chibayuki@foxmail.com
+Copyright © 2020 chibayuki@foxmail.com
 
 SudokuAlgorithm.Sudoku
-Version 20.2.17.0000
+Version 20.2.20.0000
 
 This file is part of SudokuAlgorithm
 
@@ -13,6 +13,8 @@ SudokuAlgorithm is released under the GPLv3 license
 
 using namespace std;
 
+Random Sudoku::rand;
+
 void Sudoku::_CalcProbableValues()
 {
     uint32_t All = 1;
@@ -22,7 +24,7 @@ void Sudoku::_CalcProbableValues()
         All = (All << 1) + 1;
     }
 
-    //
+    // 把所有行、列、宫的可填值用位表示，首先假设所有可能的值都可填
 
     uint32_t PV_Row[_Side];
     uint32_t PV_Column[_Side];
@@ -35,7 +37,7 @@ void Sudoku::_CalcProbableValues()
         PV_Matrix[i % _Order][i / _Order] = All;
     }
 
-    //
+    // 依次检索每行、每列、每宫，把已填的值对应的位删除
 
     for (int32_t Y = 0; Y < _Side; Y++)
     {
@@ -69,7 +71,7 @@ void Sudoku::_CalcProbableValues()
         }
     }
 
-    //
+    // 检索每个格子，将上述位域表示的可填值按位拷贝至成员字段备用，当且仅当所在行、列、宫都包含相同的可填值
 
     for (int32_t X = 0; X < _Side; X++)
     {
@@ -93,6 +95,8 @@ void Sudoku::_CalcProbableValues()
 
 bool Sudoku::_Recursion()
 {
+    // 检查数独是否无解或已填满，若未填满且可解，找出可填值数目最少的格子，从而减小搜索广度
+
     int32_t MinProbableCnt = _Side + 1;
     int32_t MinProbableID_X = -1, MinProbableID_Y = -1;
     bool SudokuIsFull = true;
@@ -128,7 +132,7 @@ bool Sudoku::_Recursion()
         }
     }
 
-    //
+    // 从可填值数目最少的格子开始随机尝试，并备份受影响的行、列、宫的可填值的位表示，递归这些操作，若无解，逐层回退对数独的修改以及可填值的位表示，并尝试下一条路径
 
     if (SudokuIsFull)
     {
@@ -136,9 +140,9 @@ bool Sudoku::_Recursion()
     }
     else
     {
-        vector<size_t> Values = BitOperation::GetBit1Index(_ProbableValues[MinProbableID_X][MinProbableID_Y]);
+        // 将当前尝试的格子的可填值随机打乱
 
-        Random rand;
+        vector<size_t> Values = BitOperation::GetBit1Index(_ProbableValues[MinProbableID_X][MinProbableID_Y]);
 
         for (int32_t i = 0; i < Values.size(); i++)
         {
@@ -149,11 +153,17 @@ bool Sudoku::_Recursion()
             Values[Index] = Temp;
         }
 
+        // 依次尝试填入每个可填值，递归
+
         for (int32_t i = 0; i < Values.size(); i++)
         {
+            // 填入一个可填值
+
             int32_t Num = Values[i];
 
             _Data[MinProbableID_X][MinProbableID_Y] = Num;
+
+            // 备份受影响的行、列、宫的可填值的位表示，用于回退
 
             uint32_t PVT_Row[_Side];
             uint32_t PVT_Column[_Side];
@@ -168,6 +178,8 @@ bool Sudoku::_Recursion()
                 PVT_Matrix[j % _Order][j / _Order] = _ProbableValues[X + j % _Order][Y + j / _Order];
             }
 
+            // 修改可填值的位表示
+
             for (int32_t j = 0; j < _Side; j++)
             {
                 BitOperation::RemoveBit(_ProbableValues[MinProbableID_X][j], Num);
@@ -175,13 +187,19 @@ bool Sudoku::_Recursion()
                 BitOperation::RemoveBit(_ProbableValues[X + j % _Order][Y + j / _Order], Num);
             }
 
+            // 递归
+
             if (_Recursion())
             {
                 return true;
             }
             else
             {
+                // 回退对数独的修改
+
                 _Data[MinProbableID_X][MinProbableID_Y] = 0;
+
+                // 回退可填值的位表示
 
                 for (int32_t j = 0; j < _Side; j++)
                 {
@@ -236,15 +254,15 @@ Sudoku& Sudoku::operator=(const Sudoku& sudoku)
     return *this;
 }
 
-bool Sudoku::TrySolve(const Sudoku& sudoku, Sudoku& result)
+bool Sudoku::TrySolve()
 {
-    Sudoku copy = sudoku;
+    Sudoku copy = *this;
 
     copy._CalcProbableValues();
 
     if (copy._Recursion())
     {
-        result = copy;
+        *this = copy;
 
         return true;
     }
@@ -260,8 +278,6 @@ Sudoku Sudoku::Question(size_t knownCount)
     {
         Values.push_back(i);
     }
-
-    Random rand;
 
     for (int32_t i = 0; i < Values.size(); i++)
     {
@@ -283,7 +299,7 @@ Sudoku Sudoku::Question(size_t knownCount)
 
     //
 
-    TrySolve(sudoku, sudoku);
+    sudoku.TrySolve();
 
     //
 

@@ -1,8 +1,8 @@
 ﻿/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-Copyright © 2019 chibayuki@foxmail.com
+Copyright © 2020 chibayuki@foxmail.com
 
 SudokuAlgorithm.BitOperation
-Version 20.2.17.0000
+Version 20.2.20.0000
 
 This file is part of SudokuAlgorithm
 

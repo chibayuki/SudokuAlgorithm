@@ -1,8 +1,8 @@
 ﻿/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-Copyright © 2019 chibayuki@foxmail.com
+Copyright © 2020 chibayuki@foxmail.com
 
 SudokuAlgorithm.Sudoku
-Version 20.2.17.0000
+Version 20.2.20.0000
 
 This file is part of SudokuAlgorithm
 
@@ -29,6 +29,8 @@ private:
 	enum { _Order = 3, _Side = 9, _Count = 81 };
 	//enum { _Order = 4, _Side = 16, _Count = 256 };
 
+	static Random rand;
+
 	int32_t _Data[_Side][_Side];
 	uint32_t _ProbableValues[_Side][_Side];
 
@@ -43,7 +45,7 @@ public:
 	Sudoku(const Sudoku& sudoku);
 	Sudoku& operator=(const Sudoku& sudoku);
 
-	static bool TrySolve(const Sudoku& sudoku, Sudoku& result);
+	bool TrySolve();
 	static Sudoku Question(size_t knownCount);
 
 #if DEBUG
